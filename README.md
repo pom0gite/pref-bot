@@ -30,11 +30,20 @@ pip install -r requirements.txt
 ## 2) Токен бота
 
 1. Создай бота у [@BotFather](https://t.me/BotFather).
-2. Скопируй токен и задай переменную окружения:
+2. Скопируй `.env.example` в `.env` и вставь токен:
 
 ```powershell
-$env:TELEGRAM_BOT_TOKEN="СЮДА_ТОКЕН"
+Copy-Item .env.example .env
+notepad .env
 ```
+
+В файле `.env` должно быть:
+
+```
+TELEGRAM_BOT_TOKEN=СЮДА_ТОКЕН
+```
+
+Файл `.env` не попадает в Git — токен остаётся только на твоём компьютере.
 
 ## 3) Запуск
 
