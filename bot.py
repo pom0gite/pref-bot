@@ -1,3 +1,4 @@
+import asyncio
 import json
 import logging
 import os
@@ -5,6 +6,7 @@ import random
 from dataclasses import dataclass
 from pathlib import Path
 
+from dotenv import load_dotenv
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.constants import ParseMode
 from telegram.ext import (
@@ -19,6 +21,8 @@ from telegram.ext import (
 
 BASE_DIR = Path(__file__).resolve().parent
 CONTENT_DIR = BASE_DIR / "content"
+
+load_dotenv(BASE_DIR / ".env")
 
 logging.basicConfig(
     level=logging.INFO,
@@ -200,7 +204,10 @@ async def callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 def require_token() -> str:
     token = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
     if not token:
-        raise RuntimeError("Не задан TELEGRAM_BOT_TOKEN. Получи токен у @BotFather и задай переменную окружения.")
+        raise RuntimeError(
+            "Не задан TELEGRAM_BOT_TOKEN. Создай файл .env в папке pref-bot "
+            "или задай переменную окружения (см. .env.example)."
+        )
     return token
 
 
@@ -212,6 +219,10 @@ def run() -> None:
     app.add_handler(CommandHandler("menu", menu_cmd))
     app.add_handler(CallbackQueryHandler(callbacks))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, text_fallback))
+    try:
+        asyncio.get_event_loop()
+    except RuntimeError:
+        asyncio.set_event_loop(asyncio.new_event_loop())
     logger.info("Bot is running.")
     app.run_polling(allowed_updates=Update.ALL_TYPES)
 
